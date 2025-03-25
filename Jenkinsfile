@@ -53,16 +53,16 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''#!/bin/bash -e
-                echo '📦 Installing pytest, pandas, numpy y scikit-learn...'
+                echo '📦 Installing pytest...'
 
                 # Ruta de Miniconda
                 CONDA_DIR="$HOME/miniconda3"
                 export PATH="$CONDA_DIR/bin:$PATH"
                 eval "$($CONDA_DIR/bin/conda shell.bash hook)"
 
-                # Activar entorno e instalar dependencias
+                # Activar entorno y instalar pytest
                 conda activate test_env
-                conda install -n test_env pytest pandas numpy scikit-learn -c conda-forge -y
+                conda install -n test_env pytest -y
                 echo '✅ Dependencies installed.'
                 '''
             }
@@ -79,8 +79,13 @@ pipeline {
                 eval "$($CONDA_DIR/bin/conda shell.bash hook)"
 
                 # Activar entorno y ejecutar pruebas
-                conda activate test_env
-                pytest
+                conda run -n test_env conda install pandas -y 
+                # Debo instalar conda create -n mlip python pytest numpy pandas scikit-learn -c conda-forge
+                conda run -n test_env conda install numpy -y
+                conda run -n test_env conda install scikit-learn -y
+                conda run -n test_env conda install -c conda-forge scikit-learn -y
+                
+                conda run -n test_env --no-capture-output pytest
 
                 echo '✅ pytest executed successfully.'
                 '''
